@@ -45,25 +45,22 @@ Build the image with the command: docker build -t paymybuddy:v1 .
 
 check the images with the command: docker images
 
-**![PayMyBuddy Overview](https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-102559.png)**
+**!(https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-102559.png)**
 
-Docker Registry
+### Docker Registry
 Deploy a private registry and store the built images in it.
+**!(https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-112448.png)**
 
-image-20250726-112448.png
-image-20250726-112540.png
-image-20250726-112321.png
-image-20250726-112223.png
+**!(https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-112540.png)**
 
-Access Website
+**!(https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-112321.png)**
+
+**!(https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-112223.png)**
+### Access Website
 Open your browser to access the application:
-image-20250726-113057.png
-image-20250726-115828.png
 
+**!(https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-113057.png)**
 
+**!(https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-115828.png)**
 
-Access website :
->>>>>>> 8a4cc18a6c406d3fc8e298b8de202405eb230922
-
-
-image-20250726-115951.png
+**!(https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-115951.png)**
