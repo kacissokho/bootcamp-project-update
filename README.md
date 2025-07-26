@@ -45,7 +45,7 @@ Build the image with the command: docker build -t paymybuddy:v1 .
 
 check the images with the command: docker images
 
-**![PayMyBuddy Overview](!(images/image-20250726-102559.png))**
+**![PayMyBuddy Overview](!(https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-102559.png))**
 
 Docker Registry
 Deploy a private registry and store the built images in it.
