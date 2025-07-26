@@ -35,4 +35,5 @@ volumes:
 
 networks:
   paymybuddy_network:
+
     
