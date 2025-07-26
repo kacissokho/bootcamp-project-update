@@ -49,18 +49,18 @@ check the images with the command: docker images
 
 ### Docker Registry
 Deploy a private registry and store the built images in it.
-**!(https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-112448.png)**
+**![](https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-112448.png)**
 
-**!(https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-112540.png)**
+**![](https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-112540.png)**
 
-**!(https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-112321.png)**
+**![](https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-112321.png)**
 
-**!(https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-112223.png)**
+**![](https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-112223.png)**
 ### Access Website
 Open your browser to access the application:
 
-**!(https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-113057.png)**
+**![](https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-113057.png)**
 
-**!(https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-115828.png)**
+**![](https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-115828.png)**
 
-**!(https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-115951.png)**
+**![](https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-115951.png)**
