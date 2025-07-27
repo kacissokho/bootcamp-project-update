@@ -56,11 +56,14 @@ Deploy a private registry and store the built images in it.
 **![](https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-112321.png)**
 
 **![](https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-112223.png)**
-### Access Website
-Open your browser to access the application:
+###  Infrastructure As Code
+Go to the directory where the docker-compose.yml is located. 
+Run the docker-compose: docker-compose up -d to start the service
 
 **![](https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-113057.png)**
 
 **![](https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-115828.png)**
+
+### Access Website:
 
 **![](https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-115951.png)**
