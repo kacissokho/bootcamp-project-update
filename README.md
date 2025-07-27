@@ -8,38 +8,12 @@ This project uses Docker and Docker Compose to define and orchestrate the enviro
 
 Install docker and docker compose
 
-Clone the application: git clone GitHub - kacissokho/bootcamp-project-update
+Clone the application:
+ git clone git@github.com:kacissokho/bootcamp-project-update.git
 
 Move to the cloned repos: cd bootcamp-project-update/mini-projet-docker
 
-### Components:
-paymybuddy: Java application running on amazoncorretto:17-alpine
-
-paymybuddydb: MySQL database server, Stores users, transactions, and account details
-
-### Networks
-paymybuddynetwork: bridge type
-
-### Volumes
-db_paymybuddy: Persistent volume used by MySQL to store database data.
-
-### Environment Variables
-These variables are defined in the .env file:
-
-SPRING_DATASOURCE_USERNAME: Username for the database connection
-
-SPRING_DATASOURCE_PASSWORD: Password for the database connection
-
-SPRING_DATASOURCE_URL: JDBC URL for connecting to the MySQL database
-
- #### Database Initialization:
-  
-The database schema is initialized using the initdb directory, which contains SQL scripts to set up    the required tables and initial data. 
-
-
 ### Build :
-
-Navigate to the directory where the Dockerfile is located and build the image:
 
 Build the image with the command: docker build -t paymybuddy:v1 . 
 
@@ -67,3 +41,28 @@ Run the docker-compose: docker-compose up -d to start the service
 ### Access Website:
 
 **![](https://github.com/kacissokho/bootcamp-project-update/blob/master/images/image-20250726-115951.png)**
+
+### Components:
+paymybuddy: Java application running on amazoncorretto:17-alpine
+
+paymybuddydb: MySQL database server, Stores users, transactions, and account details
+
+### Networks
+paymybuddynetwork: bridge type
+
+### Volumes
+db_paymybuddy: Persistent volume used by MySQL to store database data.
+
+### Environment Variables
+These variables are defined in the .env file:
+
+SPRING_DATASOURCE_USERNAME: Username for the database connection
+
+SPRING_DATASOURCE_PASSWORD: Password for the database connection
+
+SPRING_DATASOURCE_URL: JDBC URL for connecting to the MySQL database
+
+ #### Database Initialization:
+  
+The database schema is initialized using the initdb directory, which contains SQL scripts to set up    the required tables and initial data. 
+
