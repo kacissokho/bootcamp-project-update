@@ -1,14 +1,14 @@
 ### PayMyBuddy Application
-Overview
+
 The PayMyBuddy application is a Java-based application that uses MySQL as its backend database. 
 
 This project uses Docker and Docker Compose to define and orchestrate the environment.
 
-### prerequisites:
+### Requirements:
 
 Install docker and docker compose
 
-Clone the application:
+ Clone the application:
  git clone git@github.com:kacissokho/bootcamp-project-update.git
 
 Move to the cloned repos: cd bootcamp-project-update/mini-projet-docker
