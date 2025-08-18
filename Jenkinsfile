@@ -8,7 +8,7 @@ pipeline {
     }
 
     environment {
-        DOCKERHUB_AUTH = credentials('kacissokho')
+        DOCKERHUB_AUTH = credentials('dockerhub')
         MYSQL_AUTH = credentials('MYSQL_AUTH')
         IMAGE_NAME = 'paymybuddy'
         IMAGE_TAG = 'latest'
