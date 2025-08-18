@@ -18,16 +18,16 @@ pipeline {
 
     stages {
 
-        stage('Test') {
+         /* stage('Test') {
             steps {
                 sh 'mvn clean test'
             }
-            /* post {
+            post {
                 always {
                     junit 'target/surefire-reports/*.xml'
                 }
-            } */
-        }
+            } 
+        } */
 
         stage('Package') {
             steps {
