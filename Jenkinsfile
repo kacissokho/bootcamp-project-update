@@ -4,7 +4,7 @@ pipeline {
         DOCKERHUB_AUTH = credentials('dockerhub')
         ID_DOCKER = "${DOCKERHUB_AUTH_USR}"
         PORT_EXPOSED = "80"
-        IMAGE_NAME = "puymybuddybootcamp26"
+        IMAGE_NAME = "paymybuddy"
         IMAGE_TAG = "v1.4"
         DOCKER_USERNAME = 'kacissokho'
     }
