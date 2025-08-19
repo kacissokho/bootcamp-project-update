@@ -12,8 +12,9 @@ pipeline {
 
   options {
     timestamps()
-    ansiColor('xterm')
     skipDefaultCheckout(true)
+    // Remplace ansiColor(...) par un wrapper global compatible Declarative
+    wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm'])
   }
 
   stages {
@@ -22,7 +23,7 @@ pipeline {
     }
 
     stage('Build & Push image') {
-      // Utilise une image qui contient le CLI Docker + buildx et monte la socket
+      // Image qui contient le CLI Docker + buildx, avec la socket de l'hôte
       agent {
         docker {
           image 'docker:24-cli'
@@ -30,7 +31,6 @@ pipeline {
         }
       }
       steps {
-        // IMPORTANT : block shell en quotes simples pour éviter l'interpolation Groovy des secrets
         sh '''
           set -euxo pipefail
           docker version
@@ -58,7 +58,6 @@ pipeline {
             ssh-keyscan -t rsa,ecdsa,ed25519 "$HOSTNAME_DEPLOY_STAGING" >> ~/.ssh/known_hosts
             scp -r deploy ubuntu@"$HOSTNAME_DEPLOY_STAGING":/home/ubuntu/
 
-            # On exécute tout côté remote dans un bash -s (et on alimente les secrets via env)
             ssh ubuntu@"$HOSTNAME_DEPLOY_STAGING" bash -s <<'REMOTE'
               set -euxo pipefail
               cd deploy
@@ -80,7 +79,6 @@ pipeline {
     stage('Test Staging') {
       when { anyOf { branch 'master'; branch 'main' } }
       steps {
-        // Pas d’apt-get : on utilise une image curl éphémère
         sh '''
           set -euxo pipefail
           sleep 15
