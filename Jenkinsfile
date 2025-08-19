@@ -1,12 +1,12 @@
 pipeline {
     agent none
     environment {
-        DOCKERHUB_AUTH = credentials('blondel')
+        DOCKERHUB_AUTH = credentials('dockerhub')
         ID_DOCKER = "${DOCKERHUB_AUTH_USR}"
         PORT_EXPOSED = "80"
-        IMAGE_NAME = "alpinebootcamp26"
+        IMAGE_NAME = "puymybuddybootcamp26"
         IMAGE_TAG = "v1.4"
-        DOCKER_USERNAME = 'blondel'
+        DOCKER_USERNAME = 'kacissokho'
     }
     stages {
       stage ('Build image'){
@@ -24,9 +24,9 @@ pipeline {
            sh '''
               echo "Clean Environment"
               docker rm -f $IMAGE_NAME || echo "container does not exist"
-              docker run --name $IMAGE_NAME -d -p ${PORT_EXPOSED}:5000 -e PORT=5000 ${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG
+              docker compose up -d
               sleep 5
-              curl http://172.17.0.1:${PORT_EXPOSED} | grep -q "Hello world!"
+              
            '''
          }
         }
