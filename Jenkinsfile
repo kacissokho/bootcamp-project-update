@@ -65,7 +65,7 @@ pipeline {
                     ssh -o StrictHostKeyChecking=no -l ubuntu $SERVER_IP "docker rm -f $IMAGE_NAME || echo 'All deleted'"
                     ssh -o StrictHostKeyChecking=no -l ubuntu $SERVER_IP "docker pull $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG || echo 'Image Download successfully'"
                     sleep 30
-                    ssh -o StrictHostKeyChecking=no -l ubuntu $SERVER_IP "docker compose up -d"
+                    ssh -o StrictHostKeyChecking=no -l ubuntu $SERVER_IP "git clone "
                     sleep 5
                     
                 '''
