@@ -3,7 +3,7 @@ pipeline {
     environment {
         DOCKERHUB_AUTH = credentials('dockerhub')
         ID_DOCKER = "${DOCKERHUB_AUTH_USR}"
-        PORT_EXPOSED = "80"
+        PORT_EXPOSED = "8090"
         IMAGE_NAME = "paymybuddy"
         IMAGE_TAG = "v1.4"
         DOCKER_USERNAME = 'kacissokho'
@@ -57,7 +57,7 @@ pipeline {
       stage('Deploy in staging'){
           agent any
             environment {
-                SERVER_IP = "44.201.192.173"
+                SERVER_IP = "54.92.175.115"
             }
           steps {
             sshagent(['SSH_AUTH_SERVER']) {
@@ -75,7 +75,7 @@ pipeline {
       stage('Deploy in prod'){
           agent any
             environment {
-                HOSTNAME_DEPLOY_PROD = "3.87.192.119"
+                HOSTNAME_DEPLOY_PROD = "54.226.144.55"
             }
           steps {
             sshagent(credentials: ['SSH_AUTH_SERVER']) {
