@@ -65,7 +65,8 @@ pipeline {
                     ssh -o StrictHostKeyChecking=no -l ubuntu $SERVER_IP "docker rm -f $IMAGE_NAME || echo 'All deleted'"
                     ssh -o StrictHostKeyChecking=no -l ubuntu $SERVER_IP "docker pull $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG || echo 'Image Download successfully'"
                     sleep 30
-                    ssh -o StrictHostKeyChecking=no -l ubuntu $SERVER_IP "git clone "
+                    ssh -o StrictHostKeyChecking=no -l ubuntu $SERVER_IP "git clone https://github.com/kacissokho/bootcamp-project-update.git || echo 'le clone existe dejà"
+                    ssh -o StrictHostKeyChecking=no -l ubuntu $SERVER_IP "cd /home/ubuntu/bootcamp-project-update && docker compose up -d" 
                     sleep 5
                     
                 '''
