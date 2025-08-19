@@ -65,7 +65,7 @@ pipeline {
                     ssh -o StrictHostKeyChecking=no -l ubuntu $SERVER_IP "docker rm -f $IMAGE_NAME || echo 'All deleted'"
                     ssh -o StrictHostKeyChecking=no -l ubuntu $SERVER_IP "docker pull $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG || echo 'Image Download successfully'"
                     sleep 30
-                    ssh -o StrictHostKeyChecking=no -l ubuntu $SERVER_IP "docker run --rm -dp $PORT_EXPOSED:5000 -e PORT=5000 --name $IMAGE_NAME $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG"
+                    ssh -o StrictHostKeyChecking=no -l ubuntu $SERVER_IP "docker compose up -d"
                     sleep 5
                     
                 '''
@@ -85,7 +85,7 @@ pipeline {
                     command1="docker login -u $DOCKERHUB_AUTH_USR -p $DOCKERHUB_AUTH_PSW"
                     command2="docker pull $DOCKERHUB_AUTH_USR/$IMAGE_NAME:$IMAGE_TAG"
                     command3="docker rm -f alpinebootcampp || echo 'app does not exist'"
-                    command4="docker run -d -p 80:5000 -e PORT=5000 --name alpinebootcampp $DOCKERHUB_AUTH_USR/$IMAGE_NAME:$IMAGE_TAG"
+                    command4="docker compose up -d"
                     ssh -o StrictHostKeyChecking=no ubuntu@${HOSTNAME_DEPLOY_PROD} \
                         -o SendEnv=IMAGE_NAME \
                         -o SendEnv=IMAGE_TAG \
