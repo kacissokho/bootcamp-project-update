@@ -27,13 +27,13 @@ pipeline {
                     junit 'target/surefire-reports/*.xml'
                 }
             } 
-        } */
+        }
 
         stage('Package') {
             steps {
                 sh 'mvn clean package -DskipTests'
             }
-        }
+        } */
 
         stage('Build and push IMAGE to docker registry') {
             steps {
