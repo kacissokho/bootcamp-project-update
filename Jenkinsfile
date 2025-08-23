@@ -85,7 +85,7 @@ stage('Deploy in staging') {
   steps {
     sshagent(credentials: ['SSH_AUTH_SERVER']) {
       sh '''
-        set -euo pipefail
+        set -eu
 
         # Prépare ~/.ssh
         mkdir -p ~/.ssh
@@ -98,35 +98,31 @@ stage('Deploy in staging') {
         scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts \
             -r deploy ubuntu@"${SERVER_IP}":/home/ubuntu/
 
-        # Prépare les commandes distantes (tout en chemins absolus)
-        remote_prep="mkdir -p /home/ubuntu/deploy/{secrets,env}"
+        # Prépare et exécute les commandes distantes
+        remote="
+          set -eu;
+          mkdir -p /home/ubuntu/deploy/{secrets,env};
+          cd /home/ubuntu/deploy;
+          echo '${DOCKERHUB_AUTH_PSW}' | docker login -u '${DOCKERHUB_AUTH_USR}' --password-stdin;
+          echo 'IMAGE_VERSION=${DOCKERHUB_AUTH_USR}/${IMAGE_NAME}:${IMAGE_TAG}' > .env;
+          echo '${MYSQL_AUTH_PSW}' > secrets/db_password.txt;
+          echo '${MYSQL_AUTH_USR}' > secrets/db_user.txt;
+          {
+            echo 'SPRING_DATASOURCE_URL=jdbc:mysql://paymybuddydb:3306/db_paymybuddy';
+            echo 'SPRING_DATASOURCE_PASSWORD=${MYSQL_AUTH_PSW}';
+            echo 'SPRING_DATASOURCE_USERNAME=${MYSQL_AUTH_USR}';
+          } > env/paymybuddy.env;
+          (docker compose down || true);
+          docker pull ${DOCKERHUB_AUTH_USR}/${IMAGE_NAME}:${IMAGE_TAG};
+          docker compose up -d;
+        "
 
-        remote_login="cd /home/ubuntu/deploy && echo \\"${DOCKERHUB_AUTH_PSW}\\" | docker login -u \\"${DOCKERHUB_AUTH_USR}\\" --password-stdin"
-
-        remote_env="cd /home/ubuntu/deploy && \
-          echo \\"IMAGE_VERSION=${DOCKERHUB_AUTH_USR}/${IMAGE_NAME}:${IMAGE_TAG}\\" > .env && \
-          echo \\"${MYSQL_AUTH_PSW}\\" > secrets/db_password.txt && \
-          echo \\"${MYSQL_AUTH_USR}\\" > secrets/db_user.txt && \
-          { \
-            echo \\"SPRING_DATASOURCE_URL=jdbc:mysql://paymybuddydb:3306/db_paymybuddy\\"; \
-            echo \\"SPRING_DATASOURCE_PASSWORD=${MYSQL_AUTH_PSW}\\"; \
-            echo \\"SPRING_DATASOURCE_USERNAME=${MYSQL_AUTH_USR}\\"; \
-          } > env/paymybuddy.env"
-
-        remote_deploy="cd /home/ubuntu/deploy && \
-          (docker compose down || true) && \
-          docker pull ${DOCKERHUB_AUTH_USR}/${IMAGE_NAME}:${IMAGE_TAG} && \
-          docker compose up -d"
-
-        # Exécution sur le serveur
         ssh -t -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts \
-            ubuntu@"${SERVER_IP}" \
-            bash -lc "$remote_prep && $remote_login && $remote_env && $remote_deploy"
+            ubuntu@"${SERVER_IP}" sh -lc "$remote"
       '''
     }
   }
 }
-
 
       stage('Deploy in prod'){
           agent any
