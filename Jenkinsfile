@@ -57,7 +57,7 @@ pipeline {
           }
       }
 
-      stage('Deploy in staging'){
+      /* stage('Deploy in staging'){
           agent any
             environment {
                 SERVER_IP = "35.175.226.181"
@@ -76,6 +76,40 @@ pipeline {
             }
           }
       }
+      */
+stage('Deploy in staging') {
+   environment {
+                SERVER_IP = "35.175.226.181"
+            }
+    steps {
+        sshagent(credentials: ['SSH_AUTH_SERVER']) { 
+            sh '''
+                [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
+                ssh-keyscan -t rsa,dsa ${SERVER_IP} >> ~/.ssh/known_hosts
+
+                # Transfert du dossier deploy vers le serveur Ubuntu
+                scp -r deploy ubuntu@${SERVER_IP}:/home/ubuntu/
+
+                # Commandes à exécuter sur le serveur distant
+                command1="cd deploy && echo ${DOCKERHUB_AUTH_PSW} | docker login -u ${DOCKERHUB_AUTH_USR} --password-stdin"
+                command2="echo 'IMAGE_VERSION=${DOCKERHUB_AUTH_USR}/${IMAGE_NAME}:${IMAGE_TAG}' > .env && echo ${MYSQL_AUTH_PSW} > secrets/db_password.txt && echo ${MYSQL_AUTH_USR} > secrets/db_user.txt"
+                command3="echo 'SPRING_DATASOURCE_URL=jdbc:mysql://paymybuddydb:3306/db_paymybuddy' > env/paymybuddy.env && echo 'SPRING_DATASOURCE_PASSWORD=${MYSQL_AUTH_PSW}' >> env/paymybuddy.env && echo 'SPRING_DATASOURCE_USERNAME=${MYSQL_AUTH_USR}' >> env/paymybuddy.env"
+                command4="docker compose down && docker pull ${DOCKERHUB_AUTH_USR}/${IMAGE_NAME}:${IMAGE_TAG}"
+                command5="docker compose up -d"
+
+                ssh -t ubuntu@${SERVER_IP} \
+                    -o SendEnv=IMAGE_NAME \
+                    -o SendEnv=IMAGE_TAG \
+                    -o SendEnv=DOCKERHUB_AUTH_USR \
+                    -o SendEnv=DOCKERHUB_AUTH_PSW \
+                    -o SendEnv=MYSQL_AUTH_USR \
+                    -o SendEnv=MYSQL_AUTH_PSW \
+                    -C "$command1 && $command2 && $command3 && $command4 && $command5"
+            '''
+        }
+    }
+}
+
       stage('Deploy in prod'){
           agent any
             environment {
