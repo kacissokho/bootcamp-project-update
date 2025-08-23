@@ -24,7 +24,7 @@ pipeline {
            sh '''
               echo "Clean Environment"
               docker rm -f $IMAGE_NAME || echo "container does not exist"
-              docker compose up -d
+              docker-compose up -d
               sleep 5
               
            '''
