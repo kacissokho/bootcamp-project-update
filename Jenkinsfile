@@ -68,6 +68,12 @@ pipeline {
 
           # Crée l’app si elle n’existe pas (idempotent)
           heroku apps:info -a "${STAGING}" >/dev/null 2>&1 || heroku create "${STAGING}"
+           # <<< FIX >>> bascule sur le stack container
+          heroku stack:set container -a "${STAGING}"
+
+          docker tag ${DOCKER_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG} registry.heroku.com/${STAGING}/web
+          docker push registry.heroku.com/${STAGING}/web
+          heroku container:release -a "${STAGING}" web
 
           # Tag l'image locale vers le registre Heroku et pousse cette image (évite un rebuild)
           docker tag ${DOCKER_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG} registry.heroku.com/${STAGING}/web
@@ -91,6 +97,12 @@ pipeline {
 
           heroku container:login
           heroku apps:info -a "${PRODUCTION}" >/dev/null 2>&1 || heroku create "${PRODUCTION}"
+          # <<< FIX >>> bascule sur le stack container
+          heroku stack:set container -a "${PRODUCTION}"
+
+          docker tag ${DOCKER_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG} registry.heroku.com/${PRODUCTION}/web
+          docker push registry.heroku.com/${PRODUCTION}/web
+          heroku container:release -a "${PRODUCTION}" web
 
           docker tag ${DOCKER_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG} registry.heroku.com/${PRODUCTION}/web
           docker push registry.heroku.com/${PRODUCTION}/web
