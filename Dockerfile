@@ -7,4 +7,4 @@ WORKDIR /app
 
 COPY target/paymybuddy.jar /app/paymybuddy.jar
 
-CMD ["java", "-jar", "paymybuddy.jar"]
+CMD ["sh","-c","java -jar paymybuddy.jar --server.port=${PORT:-8080}"]
