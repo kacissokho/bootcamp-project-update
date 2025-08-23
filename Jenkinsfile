@@ -78,6 +78,7 @@ pipeline {
       }
       */
 stage('Deploy in staging') {
+    agent any
    environment {
                 SERVER_IP = "35.175.226.181"
             }
