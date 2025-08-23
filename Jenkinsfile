@@ -31,7 +31,7 @@ pipeline {
          }
         }
       }
-      */
+      
       stage('Clean Container'){
           agent any
           steps {
@@ -43,6 +43,8 @@ pipeline {
               }
           }
       }
+      */
+        
       stage('Login and Push Image on docker hub'){
           agent any
           steps {
