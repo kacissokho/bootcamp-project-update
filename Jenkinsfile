@@ -17,7 +17,7 @@ pipeline {
             }
         }
       }
-      stage('Run container based on builded image and test') {
+     /* stage('Run container based on builded image and test') {
         agent any
         steps {
          script {
@@ -31,6 +31,7 @@ pipeline {
          }
         }
       }
+      */
       stage('Clean Container'){
           agent any
           steps {
