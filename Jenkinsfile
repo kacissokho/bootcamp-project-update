@@ -77,6 +77,31 @@ pipeline {
           }
       }
       */
+stage('Debug SSH reachability') {
+  agent any
+  environment {
+    SERVER_IP = "35.175.226.181"
+    SSH_PORT  = "22"
+  }
+  steps {
+    sh '''
+      set -eu
+      echo "Egress public IP (try 2 services):"
+      (curl -s https://ifconfig.me || true); echo
+      (curl -s https://api.ipify.org || true); echo
+
+      echo "Test SSH (verbose, 5s timeout)…"
+      # Utilise le client SSH (déjà présent car tu l’emploies pour scp)
+      if ssh -vvv -o ConnectTimeout=5 -o StrictHostKeyChecking=no -o BatchMode=yes \
+            -p "${SSH_PORT}" ubuntu@"${SERVER_IP}" echo ok 2>&1 | tail -n 5; then
+        echo "SSH reachable"
+      else
+        echo "SSH NOT reachable"; exit 1
+      fi
+    '''
+  }
+}
+
 stage('Deploy in staging') {
   agent any
   environment {
