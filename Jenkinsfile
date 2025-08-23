@@ -1,178 +1,103 @@
 pipeline {
-    agent none
-    environment {
-        DOCKERHUB_AUTH = credentials('dockerhub')
-        ID_DOCKER = "${DOCKERHUB_AUTH_USR}"
-        PORT_EXPOSED = "8090"
-        IMAGE_NAME = "paymybuddy"
-        IMAGE_TAG = "v1.4"
-        DOCKER_USERNAME = 'kacissokho'
-    }
-    stages {
-      stage ('Build image'){
-          agent any
-          steps {
-            script {
-                sh 'docker build -t ${ID_DOCKER}/${IMAGE_NAME}:${IMAGE_TAG} .'
-            }
-        }
-      }
-     /* stage('Run container based on builded image and test') {
-        agent any
-        steps {
-         script {
-           sh '''
-              echo "Clean Environment"
-              docker rm -f $IMAGE_NAME || echo "container does not exist"
-              docker-compose up -d
-              sleep 5
-              
-           '''
-         }
-        }
-      }
-      
-      stage('Clean Container'){
-          agent any
-          steps {
-              script {
-                  sh '''
-                      docker stop $IMAGE_NAME
-                      docker rm $IMAGE_NAME
-                  '''
-              }
-          }
-      }
-      */
-        
-      stage('Login and Push Image on docker hub'){
-          agent any
-          steps {
-              script {
-                  sh '''
-                    docker login -u $DOCKERHUB_AUTH_USR -p $DOCKERHUB_AUTH_PSW
-                    docker push ${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG
-                  '''
-              }
-          }
-      }
-
-      /* stage('Deploy in staging'){
-          agent any
-            environment {
-                SERVER_IP = "75.101.200.204"
-            }
-          steps {
-            sshagent(['SSH_AUTH_SERVER']) {
-                sh '''
-                    ssh -o StrictHostKeyChecking=no -l ubuntu $SERVER_IP "docker rm -f $IMAGE_NAME || echo 'All deleted'"
-                    ssh -o StrictHostKeyChecking=no -l ubuntu $SERVER_IP "docker pull $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG || echo 'Image Download successfully'"
-                    sleep 30
-                    ssh -o StrictHostKeyChecking=no -l ubuntu $SERVER_IP "git clone https://github.com/kacissokho/bootcamp-project-update.git || echo 'le clone existe dejà"
-                    ssh -o StrictHostKeyChecking=no -l ubuntu $SERVER_IP "cd /home/ubuntu/bootcamp-project-update && docker-compose up -d" 
-                    sleep 5
-                    
-                '''
-            }
-          }
-      }
-      */
-stage('Debug SSH reachability') {
-  agent any
+  agent none
   environment {
-    SERVER_IP = "35.175.226.181"
-    SSH_PORT  = "22"
+    // Image Docker locale
+    DOCKER_USERNAME = 'kacissokho'
+    IMAGE_NAME      = 'paymybuddy'
+    IMAGE_TAG       = 'v1.4'
+    PORT_EXPOSED    = '8090'   // Port utilisé pour le run de test local
+
+    // Apps Heroku (à adapter si nécessaire)
+    STAGING    = 'paymybuddy-staging'
+    PRODUCTION = 'paymybuddy-production'
   }
-  steps {
-    sh '''
-      set -eu
-      echo "Egress public IP (try 2 services):"
-      (curl -s https://ifconfig.me || true); echo
-      (curl -s https://api.ipify.org || true); echo
 
-      echo "Test SSH (verbose, 5s timeout)…"
-      # Utilise le client SSH (déjà présent car tu l’emploies pour scp)
-      if ssh -vvv -o ConnectTimeout=5 -o StrictHostKeyChecking=no -o BatchMode=yes \
-            -p "${SSH_PORT}" ubuntu@"${SERVER_IP}" echo ok 2>&1 | tail -n 5; then
-        echo "SSH reachable"
-      else
-        echo "SSH NOT reachable"; exit 1
-      fi
-    '''
-  }
-}
+  stages {
 
-stage('Deploy in staging') {
-  agent any
-  environment {
-    SERVER_IP = "35.175.226.181"
-  }
-  steps {
-    sshagent(credentials: ['SSH_AUTH_SERVER']) {
-      sh '''
-        set -eu
+    stage('Build image') {
+      agent any
+      steps {
+        sh 'docker build -t ${DOCKER_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG} .'
+      }
+    }
 
-        # Prépare ~/.ssh
-        mkdir -p ~/.ssh
-        chmod 0700 ~/.ssh
+   /* stage('Run container (smoke test)') {
+      agent any
+      steps {
+        sh '''
+          set -eu
+          docker rm -f ${IMAGE_NAME} 2>/dev/null || true
+          docker run --name ${IMAGE_NAME} -d -p ${PORT_EXPOSED}:${PORT_EXPOSED} \
+            -e PORT=${PORT_EXPOSED} ${DOCKER_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG}
 
-        # Ajoute la clé d'hôte (ne pas échouer si rien n'est renvoyé)
-        ssh-keyscan -H -t rsa,ecdsa,ed25519 "${SERVER_IP}" >> ~/.ssh/known_hosts 2>/dev/null || true
+          # Test basique : page d'accueil répond (HTTP 2xx)
+          # Si ton app a une route santé, remplace par /actuator/health ou similaire.
+          for i in $(seq 1 10); do
+            if curl -fsS "http://127.0.0.1:${PORT_EXPOSED}/" >/dev/null; then
+              echo "Smoke test OK"; exit 0
+            fi
+            echo "En attente du service... ($i/10)"; sleep 2
+          done
+          echo "Smoke test FAILED"; exit 1
+        '''
+      }
+    }
 
-        # Transfert du dossier deploy vers /home/ubuntu
-        scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts \
-            -r deploy ubuntu@"${SERVER_IP}":/home/ubuntu/
+    stage('Clean container de test') {
+      agent any
+      steps {
+        sh '''
+          docker stop ${IMAGE_NAME} 2>/dev/null || true
+          docker rm   ${IMAGE_NAME} 2>/dev/null || true
+        '''
+      }
+    }
+*/
+    stage('Push + Release sur Heroku (staging)') {
+      when { expression { env.GIT_BRANCH == 'origin/master' || env.BRANCH_NAME == 'master' } }
+      agent any
+      environment {
+        HEROKU_API_KEY = credentials('heroku_api_key')
+      }
+      steps {
+        sh '''
+          set -eu
 
-        # Prépare et exécute les commandes distantes
-        remote="
-          set -eu;
-          mkdir -p /home/ubuntu/deploy/{secrets,env};
-          cd /home/ubuntu/deploy;
-          echo '${DOCKERHUB_AUTH_PSW}' | docker login -u '${DOCKERHUB_AUTH_USR}' --password-stdin;
-          echo 'IMAGE_VERSION=${DOCKERHUB_AUTH_USR}/${IMAGE_NAME}:${IMAGE_TAG}' > .env;
-          echo '${MYSQL_AUTH_PSW}' > secrets/db_password.txt;
-          echo '${MYSQL_AUTH_USR}' > secrets/db_user.txt;
-          {
-            echo 'SPRING_DATASOURCE_URL=jdbc:mysql://paymybuddydb:3306/db_paymybuddy';
-            echo 'SPRING_DATASOURCE_PASSWORD=${MYSQL_AUTH_PSW}';
-            echo 'SPRING_DATASOURCE_USERNAME=${MYSQL_AUTH_USR}';
-          } > env/paymybuddy.env;
-          (docker compose down || true);
-          docker pull ${DOCKERHUB_AUTH_USR}/${IMAGE_NAME}:${IMAGE_TAG};
-          docker compose up -d;
-        "
+          # Connexion au registre Heroku
+          heroku container:login
 
-        ssh -t -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts \
-            ubuntu@"${SERVER_IP}" sh -lc "$remote"
-      '''
+          # Crée l’app si elle n’existe pas (idempotent)
+          heroku apps:info -a "${STAGING}" >/dev/null 2>&1 || heroku create "${STAGING}"
+
+          # Tag l'image locale vers le registre Heroku et pousse cette image (évite un rebuild)
+          docker tag ${DOCKER_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG} registry.heroku.com/${STAGING}/web
+          docker push registry.heroku.com/${STAGING}/web
+
+          # Release
+          heroku container:release -a "${STAGING}" web
+        '''
+      }
+    }
+
+    stage('Push + Release sur Heroku (production)') {
+      when { expression { env.GIT_BRANCH == 'origin/master' || env.BRANCH_NAME == 'master' } }
+      agent any
+      environment {
+        HEROKU_API_KEY = credentials('heroku_api_key')
+      }
+      steps {
+        sh '''
+          set -eu
+
+          heroku container:login
+          heroku apps:info -a "${PRODUCTION}" >/dev/null 2>&1 || heroku create "${PRODUCTION}"
+
+          docker tag ${DOCKER_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG} registry.heroku.com/${PRODUCTION}/web
+          docker push registry.heroku.com/${PRODUCTION}/web
+
+          heroku container:release -a "${PRODUCTION}" web
+        '''
+      }
     }
   }
-}
-
-      stage('Deploy in prod'){
-          agent any
-            environment {
-                HOSTNAME_DEPLOY_PROD = "98.83.222.91"
-            }
-          steps {
-            sshagent(credentials: ['SSH_AUTH_SERVER']) {
-                sh '''
-                    [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
-                    ssh-keyscan -t rsa,dsa ${HOSTNAME_DEPLOY_PROD} >> ~/.ssh/known_hosts
-                    command1="docker login -u $DOCKERHUB_AUTH_USR -p $DOCKERHUB_AUTH_PSW"
-                    command2="docker pull $DOCKERHUB_AUTH_USR/$IMAGE_NAME:$IMAGE_TAG"
-                    command3="docker rm -f alpinebootcampp || echo 'app does not exist'"
-                    command4="docker compose up -d"
-                    ssh -o StrictHostKeyChecking=no ubuntu@${HOSTNAME_DEPLOY_PROD} \
-                        -o SendEnv=IMAGE_NAME \
-                        -o SendEnv=IMAGE_TAG \
-                        -o SendEnv=DOCKERHUB_AUTH_USR \
-                        -o SendEnv=DOCKERHUB_AUTH_PSW \
-                        -C "$command1 && $command2 && $command3 && $command4"
-                '''
-            }
-          }
-      }        
-
-    }
 }
