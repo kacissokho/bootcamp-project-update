@@ -94,15 +94,16 @@ heroku releases -a "$APP" | head -n 5
 '''
       }
     }
-sleep 60
-stage('Test Staging (simple)') {
+  stage('Test Staging') {
   agent any
   steps {
+    sleep(time: 60, unit: 'SECONDS')   // pause de 60 secondes
     sh '''
-curl -s https://paymybuddy-staging-7d54417a224b.herokuapp.com/ | grep -qi "Pay My Buddy"
-'''
+      curl -s https://paymybuddy-staging-7d54417a224b.herokuapp.com/ | grep -qi "Pay My Buddy"
+    '''
   }
 }
+
 
     stage('deploy in  PROD') {
       when { expression { env.GIT_BRANCH == 'origin/master' || env.BRANCH_NAME == 'master' } }
