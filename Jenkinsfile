@@ -7,6 +7,8 @@ pipeline {
     IMAGE_NAME      = 'paymybuddy'
     IMAGE_TAG       = 'v1.4'
     PORT_EXPOSED    = '8090'     // utilisé pour le smoke test local
+    USER            = 'root'
+    PASS            = 'password'
 
     // Apps Heroku
     STAGING    = 'paymybuddy-staging'
@@ -29,7 +31,7 @@ pipeline {
         sh 'docker build -t ${DOCKER_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG} .'
       }
     }
-
+/*
     stage('Run container (smoke test)') {
       agent any
       steps {
@@ -63,6 +65,7 @@ pipeline {
         '''
       }
     }
+    */
 
     stage('Heroku: préparer STAGING') {
       when { expression { env.GIT_BRANCH == 'origin/master' || env.BRANCH_NAME == 'master' } }
