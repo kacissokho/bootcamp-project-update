@@ -165,32 +165,13 @@ heroku releases -a "$APP" | head -n 5
     }
   }
 
- // ---------- TEST PROD ----------
-  /*  stage('Test Prod') {
-      when { expression { env.GIT_BRANCH == 'origin/master' || env.BRANCH_NAME == 'master' } }
-      agent any
-      steps {
-        sh '''
-set -eu
-URL="https://${PRODUCTION}.herokuapp.com/"
+stage('Test Production') {
+  agent any
+  steps {
+    sh 'curl -fsSL https://paymybuddy-production-05d0d1e52d13.herokuapp.com/login | grep -qi "Pay My Buddy"'
+  }
+}
 
-echo "Attente que PROD réponde sur: $URL"
-for i in $(seq 1 30); do
-  STATUS="$(curl -s -o /dev/null -w "%{http_code}" "$URL" || true)"
-  if [ "$STATUS" = "200" ]; then
-    break
-  fi
-  echo "→ HTTP $STATUS (tentative $i/30). Nouvelle tentative dans 5s…"
-  sleep 5
-done
-
-echo "Vérification du contenu…"
-curl -s "$URL" | grep -qi "Pay My Buddy"
-echo "OK: la page contient 'Pay My Buddy'."
-'''
-      }
-    }
-*/
   post {
     always { echo 'Pipeline terminé.' }
   }
