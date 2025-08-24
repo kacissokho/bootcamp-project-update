@@ -95,32 +95,14 @@ heroku releases -a "$APP" | head -n 5
       }
     }
 
-
-// ---------- TEST STAGING ----------
-    stage('Test Staging') {
-      when { expression { env.GIT_BRANCH == 'origin/master' || env.BRANCH_NAME == 'master' } }
-      agent any
-      steps {
-        sh '''
-set -eu
-URL="https://${STAGING}.herokuapp.com/"
-
-echo "Attente que STAGING réponde sur: $URL"
-for i in $(seq 1 30); do
-  STATUS="$(curl -s -o /dev/null -w "%{http_code}" "$URL" || true)"
-  if [ "$STATUS" = "200" ]; then
-    break
-  fi
-  echo "→ HTTP $STATUS (tentative $i/30). Nouvelle tentative dans 5s…"
-  sleep 5
-done
-
-echo "Vérification du contenu…"
-curl -s "$URL" | grep -qi "Pay My Buddy"
-echo "OK: la page contient 'Pay My Buddy'."
+stage('Test Staging (simple)') {
+  agent any
+  steps {
+    sh '''
+curl -s https://paymybuddy-staging-7d54417a224b.herokuapp.com/ | grep -qi "Pay My Buddy"
 '''
-      }
-    }
+  }
+}
 
     stage('deploy in  PROD') {
       when { expression { env.GIT_BRANCH == 'origin/master' || env.BRANCH_NAME == 'master' } }
