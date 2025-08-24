@@ -94,7 +94,7 @@ heroku releases -a "$APP" | head -n 5
 '''
       }
     }
-
+sleep 60
 stage('Test Staging (simple)') {
   agent any
   steps {
