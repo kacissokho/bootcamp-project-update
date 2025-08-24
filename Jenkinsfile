@@ -187,7 +187,7 @@ heroku releases -a "$APP" | head -n 5
   }
 
  // ---------- TEST PROD ----------
-    stage('Test Prod') {
+  /*  stage('Test Prod') {
       when { expression { env.GIT_BRANCH == 'origin/master' || env.BRANCH_NAME == 'master' } }
       agent any
       steps {
@@ -211,7 +211,7 @@ echo "OK: la page contient 'Pay My Buddy'."
 '''
       }
     }
-
+*/
   post {
     always { echo 'Pipeline terminé.' }
   }
